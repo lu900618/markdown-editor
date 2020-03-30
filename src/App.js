@@ -1,11 +1,12 @@
 import React from 'react';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import FileSearch from './components/FileSearch';
-import FileList from './components/FileList'
-import defaultFiles from './utils/defaultFiles'
+import FileList from './components/FileList';
+import defaultFiles from './utils/defaultFiles';
 import BottomBtn from './components/BottomBtn';
-import { faPlus, faFileImport } from '@fortawesome/free-solid-svg-icons'
+import TabList from './components/TabList';
+import { faPlus, faFileImport } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   return (
@@ -14,12 +15,21 @@ function App() {
         <div className="col-3 bg-light left-panel">
           <FileSearch
             // title="我的云文档"
-            onFileSearch={(value) => { console.log(value) }} />
+            onFileSearch={value => {
+              console.log(value);
+            }}
+          />
           <FileList
             files={defaultFiles}
-            onFileClick={(id) => { console.log(id) }}
-            onFileDelete={(id) => { console.log(id) }}
-            onSaveEdit={(id, newVal) => { console.log(id, newVal) }}
+            onFileClick={id => {
+              console.log(id);
+            }}
+            onFileDelete={id => {
+              console.log(id);
+            }}
+            onSaveEdit={(id, newVal) => {
+              console.log(id, newVal);
+            }}
           />
 
           <div className="row no-gutters">
@@ -27,19 +37,30 @@ function App() {
               <BottomBtn
                 colorClass="btn-primary"
                 icon={faPlus}
-                onBtnClick={() => { }}
+                onBtnClick={() => {}}
               />
             </div>
             <div className="col-6">
               <BottomBtn
                 colorClass="btn-success"
                 icon={faFileImport}
-                onBtnClick={() => { }} />
+                onBtnClick={() => {}}
+              />
             </div>
           </div>
         </div>
-        <div className="col-9 bg-primary right-panel">
-          this.is.right
+        <div className="col-9 right-panel">
+          <TabList
+            files={defaultFiles}
+            activeId={'1'}
+            onTabClick={id => {
+              console.log(id);
+            }}
+            onTabClose={id => {
+              console.log('close-btn clicked', id);
+            }}
+            unsavedIds={['1', '2']}
+          />
         </div>
       </div>
     </div>
