@@ -7,6 +7,8 @@ import defaultFiles from './utils/defaultFiles';
 import BottomBtn from './components/BottomBtn';
 import TabList from './components/TabList';
 import { faPlus, faFileImport } from '@fortawesome/free-solid-svg-icons';
+import SimpleMDE from 'react-simplemde-editor';
+import 'easymde/dist/easymde.min.css';
 
 function App() {
   return (
@@ -60,6 +62,16 @@ function App() {
               console.log('close-btn clicked', id);
             }}
             unsavedIds={['1', '2']}
+          />
+          <SimpleMDE
+            className="text-left"
+            value={defaultFiles[1].body}
+            onChange={value => {
+              console.log(value);
+            }}
+            options={{
+              minHeight: '512px'
+            }}
           />
         </div>
       </div>
