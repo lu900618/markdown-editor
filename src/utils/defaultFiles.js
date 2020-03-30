@@ -10,6 +10,18 @@ const defaultFiles = [
     title: 'second post',
     body: '## should be aware of this',
     createAt: 1585496099547
+  },
+  {
+    id: '3',
+    title: 'third post',
+    body: '## should be aware of this',
+    createAt: 1585496099547
+  },
+  {
+    id: '4',
+    title: '4 post',
+    body: '## should be aware of this',
+    createAt: 1585496099547
   }
 ]
 

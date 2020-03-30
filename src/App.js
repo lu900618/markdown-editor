@@ -15,31 +15,75 @@ function App() {
   const [activeFileId, setActiveFileId] = useState('');
   const [openedFileIds, setOpenedFileIds] = useState([]);
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
+  const [searchedFiles, setSearchedFiles] = useState([]);
   const openedFiles = openedFileIds.map(fileId =>
     files.find(f => f.id === fileId)
   );
   const activeFile = files.find(f => f.id === activeFileId);
+
+  const handleFileClick = fileId => {
+    setActiveFileId(fileId);
+    !openedFileIds.includes(fileId) &&
+      setOpenedFileIds([...openedFileIds, fileId]);
+    // setUnsavedFileIds([...unsavedFileIds, fileId]);
+  };
+  const handleTabClick = fileId => {
+    setActiveFileId(fileId);
+  };
+  const handleCloseClick = fileId => {
+    const without = openedFileIds.filter(id => id !== fileId);
+    setOpenedFileIds(without);
+    if (fileId === activeFileId) {
+      if (without.length > 0) {
+        setActiveFileId(without[without.length - 1]);
+      } else {
+        setActiveFileId('');
+      }
+    }
+  };
+  const handleFileChange = (fileId, value) => {
+    const newFiles = files.map(file => {
+      if (file.id === fileId) {
+        file.body = value;
+      }
+      return file;
+    });
+    setFiles(newFiles);
+    if (!unsavedFileIds.includes(fileId)) {
+      setUnsavedFileIds([...unsavedFileIds, fileId]);
+    }
+  };
+  const handleFileDelete = fileId => {
+    const newFiles = files.filter(f => f.id !== fileId);
+    setFiles(newFiles);
+    handleCloseClick(fileId);
+  };
+  const handleUpdateTitle = (id, title) => {
+    const newFiles = files.map(f => {
+      if (f.id === id) {
+        f.title = title;
+      }
+      return f;
+    });
+    setFiles(newFiles);
+  };
+  const handleFileSearch = keywords => {
+    const newFiles = files.filter(file => file.title.includes(keywords));
+    setSearchedFiles(newFiles);
+  };
   return (
     <div className="App container-fluid px-0">
       <div className="row no-gutters">
         <div className="col-3 bg-light left-panel">
           <FileSearch
             // title="我的云文档"
-            onFileSearch={value => {
-              console.log(value);
-            }}
+            onFileSearch={handleFileSearch}
           />
           <FileList
-            files={files}
-            onFileClick={id => {
-              console.log(id);
-            }}
-            onFileDelete={id => {
-              console.log(id);
-            }}
-            onSaveEdit={(id, newVal) => {
-              console.log(id, newVal);
-            }}
+            files={searchedFiles.length > 0 ? searchedFiles : files}
+            onFileClick={handleFileClick}
+            onFileDelete={handleFileDelete}
+            onSaveEdit={handleUpdateTitle}
           />
 
           <div className="row no-gutters button-group">
@@ -68,19 +112,16 @@ function App() {
               <TabList
                 files={openedFiles}
                 activeId={activeFileId}
-                onTabClick={id => {
-                  console.log(id);
-                }}
-                onTabClose={id => {
-                  console.log('close-btn clicked', id);
-                }}
+                onTabClick={handleTabClick}
+                onTabClose={handleCloseClick}
                 unsavedIds={unsavedFileIds}
               />
               <SimpleMDE
+                key={activeFile?.id}
                 className="text-left"
                 value={activeFile?.body}
                 onChange={value => {
-                  console.log(value);
+                  handleFileChange(activeFile?.id, value);
                 }}
                 options={{
                   minHeight: '512px'
