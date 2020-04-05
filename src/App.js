@@ -10,29 +10,26 @@ import { faPlus, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import uuidv4 from 'uuid/v4';
+import { flattenArray, obj2Arr } from './utils/helper';
 
 function App() {
-  const [files, setFiles] = useState(defaultFiles);
+  const [files, setFiles] = useState(flattenArray(defaultFiles));
   const [activeFileId, setActiveFileId] = useState('');
   const [openedFileIds, setOpenedFileIds] = useState([]);
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
   const [searchedFiles, setSearchedFiles] = useState([]);
-  const openedFiles = openedFileIds.map(fileId =>
-    files.find(f => f.id === fileId)
-  );
-  const activeFile = files.find(f => f.id === activeFileId);
-
-  const handleFileClick = fileId => {
+  const filesArr = obj2Arr(files)
+  const handleFileClick = (fileId) => {
     setActiveFileId(fileId);
     !openedFileIds.includes(fileId) &&
       setOpenedFileIds([...openedFileIds, fileId]);
     // setUnsavedFileIds([...unsavedFileIds, fileId]);
   };
-  const handleTabClick = fileId => {
+  const handleTabClick = (fileId) => {
     setActiveFileId(fileId);
   };
-  const handleCloseClick = fileId => {
-    const without = openedFileIds.filter(id => id !== fileId);
+  const handleCloseClick = (fileId) => {
+    const without = openedFileIds.filter((id) => id !== fileId);
     setOpenedFileIds(without);
     if (fileId === activeFileId) {
       if (without.length > 0) {
@@ -43,50 +40,41 @@ function App() {
     }
   };
   const handleFileChange = (fileId, value) => {
-    const newFiles = files.map(file => {
-      if (file.id === fileId) {
-        file.body = value;
-      }
-      return file;
-    });
-    setFiles(newFiles);
+    const newFile = { ...files[fileId], body: value };
+    setFiles({ ...files, [fileId]: newFile });
     if (!unsavedFileIds.includes(fileId)) {
       setUnsavedFileIds([...unsavedFileIds, fileId]);
     }
   };
-  const handleFileDelete = fileId => {
-    const newFiles = files.filter(f => f.id !== fileId);
-    setFiles(newFiles);
+  const handleFileDelete = (fileId) => {
+    delete files[fileId];
+    setFiles(files);
     handleCloseClick(fileId);
   };
   const handleUpdateTitle = (id, title) => {
-    const newFiles = files.map(f => {
-      if (f.id === id) {
-        f.title = title;
-        f.isNew = false;
-      }
-      return f;
-    });
-    setFiles(newFiles);
+    const modifiedFile = { ...files[id], title, isNew: false };
+    setFiles({ ...files, [id]: modifiedFile });
   };
-  const handleFileSearch = keywords => {
-    const newFiles = files.filter(file => file.title.includes(keywords));
+  const handleFileSearch = (keywords) => {
+    const newFiles = filesArr.filter((file) => file.title.includes(keywords));
     setSearchedFiles(newFiles);
   };
   const createNewFile = () => {
     const newId = uuidv4();
-    const newFiles = [
-      ...files,
-      {
-        id: newId,
-        title: '',
-        body: '##',
-        createAt: Date.now(),
-        isNew: true
-      }
-    ];
-    setFiles(newFiles);
+    const newFile = {
+      id: newId,
+      title: '',
+      body: '',
+      createAt: Date.now(),
+      isNew: true,
+    };
+    setFiles({ ...files, [newId]: newFile });
   };
+  const openedFiles = openedFileIds.map((oid) => files.find[oid]);
+  const activeFile = files[activeFileId];
+  const searchArr = searchedFiles.length > 0 ? searchedFiles : filesArr;
+  console.log(searchArr);
+  
   return (
     <div className="App container-fluid px-0">
       <div className="row no-gutters">
@@ -96,7 +84,7 @@ function App() {
             onFileSearch={handleFileSearch}
           />
           <FileList
-            files={searchedFiles.length > 0 ? searchedFiles : files}
+            files={searchArr}
             onFileClick={handleFileClick}
             onFileDelete={handleFileDelete}
             onSaveEdit={handleUpdateTitle}
@@ -136,11 +124,11 @@ function App() {
                 key={activeFile?.id}
                 className="text-left"
                 value={activeFile?.body}
-                onChange={value => {
+                onChange={(value) => {
                   handleFileChange(activeFile?.id, value);
                 }}
                 options={{
-                  minHeight: '512px'
+                  minHeight: '512px',
                 }}
               />
             </>

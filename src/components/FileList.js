@@ -7,15 +7,15 @@ import useKeyPress from '../hooks/useKeyPress'
 
 const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
   const [editStatus, setEditStatus] = useState(false)
-  const [value, setValue] = useState(null)
+  const [value, setValue] = useState('')
   const enterPressed = useKeyPress(13)
   const escPressed = useKeyPress(27)
   const closeSearch = (item) => {
     setEditStatus(false)
     setValue('')
-    if (item.isNew) {
-      onFileDelete(item.id)
-    }
+    // if (item.isNew) {
+    //   onFileDelete(item.id)
+    // }
   }
   useEffect(() => {
     const editItem = files.find(file => file.id === editStatus)
@@ -29,7 +29,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
   })
   useEffect(() => {
     const newFile = files.find(file => file.isNew)
-    if (newFile) {
+    if (newFile != null) {
       setEditStatus(newFile.id)
       setValue(newFile.title)
     }
@@ -40,7 +40,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
         files.map(file => (
           <li className="row mx-0 list-group-item bg-light d-flex align-item-center file-item px-0 text-left" key={file.id}>
             {
-              (file.id !== editStatus || !file.isNew) &&
+              (file.id !== editStatus && !file.isNew) &&
               <>
                 <span className="col-2">
                   <FontAwesomeIcon icon={faMarkdown} />
