@@ -10,27 +10,37 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
   const [value, setValue] = useState(null)
   const enterPressed = useKeyPress(13)
   const escPressed = useKeyPress(27)
-  const closeSearch = () => {
+  const closeSearch = (item) => {
     setEditStatus(false)
     setValue('')
+    if (item.isNew) {
+      onFileDelete(item.id)
+    }
   }
   useEffect(() => {
-    if(enterPressed && editStatus) {
-      const editItem = files.find(file => file.id === editStatus)
+    const editItem = files.find(file => file.id === editStatus)
+    if(enterPressed && editStatus && value.trim() !== '') {
       onSaveEdit(editItem.id, value)
-      closeSearch()
+      closeSearch(editItem)
     }
     if (escPressed && editStatus) {
-      closeSearch()
+      closeSearch(editItem)
     }
   })
+  useEffect(() => {
+    const newFile = files.find(file => file.isNew)
+    if (newFile) {
+      setEditStatus(newFile.id)
+      setValue(newFile.title)
+    }
+  }, [files])
   return (
     <ul className="list-group list-group-flush file-list">
       {
         files.map(file => (
           <li className="row mx-0 list-group-item bg-light d-flex align-item-center file-item px-0 text-left" key={file.id}>
             {
-              file.id !== editStatus &&
+              (file.id !== editStatus || !file.isNew) &&
               <>
                 <span className="col-2">
                   <FontAwesomeIcon icon={faMarkdown} />
@@ -56,17 +66,18 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
               </>
             }
             {
-              file.id === editStatus &&
+              ((file.id === editStatus) || file.isNew) &&
               <>
                 <input
                   className="form-control col-10"
                   value={value}
                   onChange={(e) => { setValue(e.target.value) }}
+                  placeholder="请输入文件名称"
                 />
                 <button
                   type="button"
                   className="icon-button col-2"
-                  onClick={closeSearch}
+                  onClick={() => {closeSearch(file)}}
                 >
                   <FontAwesomeIcon icon={faTimes} title="关闭" size="lg" />
                 </button>

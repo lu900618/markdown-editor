@@ -9,6 +9,7 @@ import TabList from './components/TabList';
 import { faPlus, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
+import uuidv4 from 'uuid/v4';
 
 function App() {
   const [files, setFiles] = useState(defaultFiles);
@@ -62,6 +63,7 @@ function App() {
     const newFiles = files.map(f => {
       if (f.id === id) {
         f.title = title;
+        f.isNew = false;
       }
       return f;
     });
@@ -70,6 +72,20 @@ function App() {
   const handleFileSearch = keywords => {
     const newFiles = files.filter(file => file.title.includes(keywords));
     setSearchedFiles(newFiles);
+  };
+  const createNewFile = () => {
+    const newId = uuidv4();
+    const newFiles = [
+      ...files,
+      {
+        id: newId,
+        title: '',
+        body: '##',
+        createAt: Date.now(),
+        isNew: true
+      }
+    ];
+    setFiles(newFiles);
   };
   return (
     <div className="App container-fluid px-0">
@@ -91,7 +107,7 @@ function App() {
               <BottomBtn
                 colorClass="btn-primary"
                 icon={faPlus}
-                onBtnClick={() => {}}
+                onBtnClick={createNewFile}
               />
             </div>
             <div className="col-6">
